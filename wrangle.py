@@ -64,3 +64,40 @@ def wrangle_telco():
     df['total_charges'] = df['total_charges'].astype(float)
     
     return df
+
+# This function will connect with the Codeup database select key features in the zillow db
+# to return a pandas DataFrame
+def new_zillow_data():
+    '''
+    This function connects to the Zillow df in the Codeup database, and returns the 'bedroomcnt',
+    'bathroomcnt', 'calculatedfinishedsquarefeet', 'taxvaluedollarcnt', 'yearbuilt', 'taxamount',
+    and 'fips' from the zillow database for all 2017 customers with a single family residential
+    '''
+    sql_query = '''SELECT bedroomcnt, bathroomcnt, calculatedfinishedsquarefeet, taxvaluedollarcnt, yearbuilt, taxamount, fips
+                    FROM properties_2017
+                    WHERE propertylandusetypeid IN (261);
+                '''
+    return pd.read_sql(sql_query, get_connection('zillow'))
+
+# This function plays on top of new_zillow_data by 1st looking to see if there is a .csv of the telco Dataframe, and
+# creating one if there is not. This optomizes performance/runtime, by only needing to connect to the server 1 time
+# and then using a local .csv thereafter
+def get_zillow_data():
+    '''
+    This function reads in zillow data from Codeup database, writes data to
+    a csv file if a local file does not exist, and returns a df.
+    '''
+    if os.path.isfile('zillow_2017.csv'):
+        
+        # If csv file exists read in data from csv file.
+        df = pd.read_csv('zillow_2017.csv')
+        
+    else:
+        
+        # Read fresh data from db into a DataFrame
+        df = new_zillow_data()
+        
+        # Cache data
+        df.to_csv('zillow_2017.csv')
+
+    return df    
