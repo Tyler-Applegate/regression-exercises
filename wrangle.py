@@ -122,7 +122,7 @@ def wrangle_grades():
     return cleaned student grades DataFrame.
     '''
     # Acquire data from csv file.
-    grades = pd.read_csv('student_grades.csv', error_bad_lines=False)
+    grades = pd.read_csv('student_grades.csv')
     
     # Replace white space values with NaN values.
     grades = grades.replace(r'^\s*$', np.nan, regex=True)
